@@ -1,18 +1,26 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+constexpr uint8_t BUTTON_PIN = 16;
+volatile uint16_t buttonPresses = 0;
+volatile bool isButtonPressed = false;
+
+void IRAM_ATTR buttonIsr(){
+  buttonPresses++;
+  isButtonPressed = true;
+}
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonIsr, FALLING);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  if (isButtonPressed)
+  {
+    Serial.print("Number of presses:");
+    Serial.println(buttonPresses);
+    isButtonPressed = false;
+  }
+  
+  
 }
