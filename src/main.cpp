@@ -3,7 +3,7 @@
 constexpr uint8_t BUTTON_PIN = 16;
 uint16_t buttonPresses = 0;
 volatile bool isButtonPressed = false;
-uint32_t lastInterruptTime = 0;
+bool isButtonAlreadyPressed = false;
 
 void IRAM_ATTR buttonIsr(){
   isButtonPressed = true;
@@ -21,18 +21,19 @@ void loop() {
     noInterrupts();
     isButtonPressed = false;
     interrupts();
-    uint32_t currentTime = millis();
 
-    if (currentTime - lastInterruptTime > 50)
+    if (digitalRead(BUTTON_PIN) == LOW && !isButtonAlreadyPressed)
     {
+      isButtonAlreadyPressed = true;
       buttonPresses++;
-      lastInterruptTime = currentTime;
       Serial.print("Presses count:");
       Serial.println(buttonPresses);
     }
-    
-
-
+  }
+  
+  if (digitalRead(BUTTON_PIN) == HIGH)
+  {
+    isButtonAlreadyPressed = false;
   }
   
   
